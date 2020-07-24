@@ -5,8 +5,7 @@ const MongoClient = require('mongodb').MongoClient;
 require('dotenv').config();
 const app = express();
 const port = process.env.PORT || 3000;
-const uri = "mongodb+srv://dbRainUser:Pbvt3OX8TwOcwNg7@cluster0.kut1l.mongodb.net/dbDrops?retryWrites=true&w=majority";
-const dbConnectionString = process.env.MONGODB_URI || uri;
+const dbConnectionString = process.env.MONGODB_URI || 'mongodb://localhost:27017';
 console.log(process.env.MONGODB_URI);
 //we need the bodyParser to parse the data coming with the html form
 app.use(express.urlencoded({extended:true}));
