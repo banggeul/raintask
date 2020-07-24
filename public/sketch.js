@@ -51,7 +51,7 @@ function getUserContext() {
   const timeLimit = timeLimitOn ? document.querySelector('#timeLimit').value : -1;
   const ageYear = document.querySelector('#ageYear').value;
   const ageMonth = document.querySelector('#ageMonth').value;
-  const gender = document.querySelector('#genderOptions').options[document.getElementById("genderOptions").selectedIndex].value;
+  const gender = document.querySelector('input[name="gender"]:checked').value;
   //get the current date and time
   const timestamp = Date.now();
   //store it in the variable experiment
@@ -85,7 +85,7 @@ function setUpGame() {
         <!--video container used to be here-->
         <div id="game-ui" class="game-ui">
           <!--<p class="instruction"> Click to create rain drops.</p>-->
-          <a class="cta" href="#" id="startBtn"> Start the Game </a>
+          <a class="cta start" href="#" id="startBtn"> Start the game</a>
         </div>
         <div class="thanks">
           <h1> Thanks for your participation! </h1>

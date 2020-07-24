@@ -87,12 +87,33 @@ input {
   border-image:initial;
 }
 
-.ageInputRow {
+.ageInputRow, .genderInputRow {
   display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
+input[type="radio"] {
+    cursor: pointer;
+    display: inline-block;
+    height: 15px;
+    margin-right: 10px;
+    position: relative;
+    bottom: 1px;
+    width: 15px;
+}
+.genderOption {
+  display: flex;
+  justify-content: center;
+  width: 30%;
+  align-items: center;
+}
 .ageInputCol {
   flex: 1 1 40%;
+}
+
+.genderInputRow > input {
+
 }
 
 
@@ -165,7 +186,8 @@ input {
   left: 0;
   right: 0;
   z-index: 2;
-  font-size: 1.5em;
+  font-size: 1.3em;
+  letter-spacing: 2px;
   /* background: #333; */
 
   /* color: black; */
@@ -211,9 +233,14 @@ a.cta {
   margin-bottom: 1em;
   margin-left: 0;
   color: white;
-  background: #ff6600;
+  background: #ff5722;
   border-radius: 4px;
   transition: all .3s;
+}
+
+a.start {
+  /* background-color: #ca4036; */
+  box-shadow: 2px 2px 20px rgba(0,0,0,0.2);
 }
 
 /* a.inversed {
@@ -329,7 +356,8 @@ a.disabled {
 }
 
 input:checked + .slider {
-  background-color: #2196F3;
+  /* background-color: #2196F3; */
+  background-color: #3275ff
 }
 
 input:focus + .slider {
