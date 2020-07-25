@@ -51,7 +51,10 @@ function getUserContext() {
   const timeLimit = timeLimitOn ? document.querySelector('#timeLimit').value : -1;
   const ageYear = document.querySelector('#ageYear').value;
   const ageMonth = document.querySelector('#ageMonth').value;
-  const gender = document.querySelector('input[name="gender"]:checked').value;
+  // const gender = document.querySelector('input[name="gender"]:checked').value;
+  const genderOptions = document.getElementById('genderOptions');
+  // console.log(genderOptions.options)
+  const gender = genderOptions.options[genderOptions.selectedIndex].value;
   //get the current date and time
   const timestamp = Date.now();
   //store it in the variable experiment
@@ -66,7 +69,7 @@ function getUserContext() {
   experiment.age = { year: ageYear, month: ageMonth};
   experiment.gender = gender;
 
-  console.log(experiment);
+  // console.log(experiment);
   //make sure the game view is all hidden
   $game.style.display = "none";
   $game.style.opacity = 0;
