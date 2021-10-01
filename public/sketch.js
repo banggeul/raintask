@@ -1,44 +1,36 @@
 //import the data storing script
 import store from './utils/storage.js'
 //get the current data stored, unpack it as object
-const {data} = store.getState();
+const {
+  data
+} = store.getState();
 //create an empty object to store the new experiment data
 let experiment = {};
-//create an empty array to store the user's choices
-let dots = [];
+let sessionData = {};
+
+const totalCards = 41;
+let currentCardNum = 0;
+
+//make array for sequence set
+var environment = [];
+//array to store choices
+var choices = [-99];
+//array to store if the choice is correct guess or not
+var correct = [-99];
+//array to store card DOM objects
+var $cards = [];
+
+const cardWidth = 130;
+const cardGap = 30;
 
 //get the reference to the HTML elements we need
 const $getUserContext = document.querySelector('#collectUserContext');
 const $welcomeScreen = document.querySelector('.container');
-const $setTimeLimit = document.querySelector('#timeLimitSwitch');
-const $timeLimit = document.querySelector('#timeLimitRow');
 const $game = document.querySelector('#content');
 
-//get the reference to the video
-var video = document.querySelector("video");
-//if video exists, pause it for now
-if (video) {
-  video.play();
-  video.pause();
-}
-
-document.body.addEventListener('touchstart',()=>{
+document.body.addEventListener('touchstart', () => {
   document.activeElement.blur();
 });
-
-//watch for the click event for the toggle button for the time limit switch
-$setTimeLimit.addEventListener('click', function(){
-  //if the time limit is on
-  if(this.checked){
-    // console.log("time limit is on");
-    //then show the time limit set form
-    fadeIn($timeLimit);
-  }else{
-    // console.log("off");
-    //if it's turned off, hide the time limit form
-    fadeOut($timeLimit, true);
-  }
-})
 
 //bind the click event listener with the submit button
 $getUserContext.addEventListener('click', getUserContext);
@@ -46,30 +38,40 @@ $getUserContext.addEventListener('click', getUserContext);
 function getUserContext() {
   //get all the values from the input elements
   const userID = document.querySelector('#name').value;
-  const clickLimit = document.querySelector('#clickLimit').value;
-  const timeLimitOn = document.querySelector('#timeLimitSwitch').checked;
-  const timeLimit = timeLimitOn ? document.querySelector('#timeLimit').value : -1;
+  // const clickLimit = document.querySelector('#clickLimit').value;
+  // const timeLimitOn = document.querySelector('#timeLimitSwitch').checked;
+  // const timeLimit = timeLimitOn ? document.querySelector('#timeLimit').value : -1;
   const ageYear = document.querySelector('#ageYear').value;
   const ageMonth = document.querySelector('#ageMonth').value;
+  const sequenceSet = document.querySelector('#sequenceSet').value;
   // const gender = document.querySelector('input[name="gender"]:checked').value;
   const genderOptions = document.getElementById('genderOptions');
   // console.log(genderOptions.options)
   const gender = genderOptions.options[genderOptions.selectedIndex].value;
+  //get the image set option
+  const imageSetOptions = document.getElementById('imageSetOptions');
+  // console.log(genderOptions.options)
+  const imageSet = imageSetOptions.options[imageSetOptions.selectedIndex].value;
   //get the current date and time
   const timestamp = Date.now();
   //store it in the variable experiment
   experiment.userID = userID;
-  experiment.clickLimit = clickLimit;
-  experiment.timeLimit = timeLimit;
+  // experiment.clickLimit = clickLimit;
+  // experiment.timeLimit = timeLimit;
   experiment.timestamp = timestamp;
   experiment.windowSize = {
-    width:window.innerWidth,
-    height:window.innerHeight,
+    width: window.innerWidth,
+    height: window.innerHeight,
   };
-  experiment.age = { year: ageYear, month: ageMonth};
+  experiment.age = {
+    year: ageYear,
+    month: ageMonth
+  };
   experiment.gender = gender;
+  experiment.imageSet = imageSet;
+  experiment.sequenceSet = sequenceSet;
 
-  // console.log(experiment);
+  console.log(experiment);
   //make sure the game view is all hidden
   $game.style.display = "none";
   $game.style.opacity = 0;
@@ -81,13 +83,31 @@ function getUserContext() {
 }
 
 function setUpGame() {
+  //draw gameboard - series of rectangles
+  //draw the character on the first spot.
+  //make two buttons in the center
+  //when either one is clicked - fade it out.
+  //move the character to the next spot
+  //repeat until we are out of spot
+  //game ends
+
   // console.log("set up the game here");
   $game.innerHTML = `<div onclick="void(0);">
       <div id="gameView" class="gameView">
-        <div id="clickArea" class="clickArea"></div>
+        <div id="game-container">
+        <!-- gameboard gets drawn here -->
+          <div class="bunny" id="bunny"></div>
+        </div>
+        <div id="game-HUD" class="game-HUD">
+            <!-- carrot or no carrot button goes here -->
+            <div class="choice-card" id="left" data-choice="0"></div>
+            <div class="choice-card" id="right" data-choice="1"></div>
+        </div>
+        <div id="feedback" class="feedback">Hello</div>
+        <!-- <div id="clickArea" class="clickArea"></div>
         <!--video container used to be here-->
         <div id="game-ui" class="game-ui">
-          <!--<p class="instruction"> Click to create rain drops.</p>-->
+          <p class="instruction"> Will there be a carrot or not? You have to guess!</p>
           <a class="cta start" href="#" id="startBtn"> Start the game</a>
         </div>
         <div class="thanks">
@@ -101,42 +121,42 @@ function setUpGame() {
       </div>
     </div>`;
 
-  // var clickEvent = new MouseEvent("click", {
-  //   "view": window,
-  //   "bubbles": true,
-  //   "cancelable": false
-  // });
-
-
-
   let timeID;
   let isGameOn = false;
 
   //get the reference to the game view HTML elements
   const $startBtn = document.querySelector('#startBtn');
   const $gameView = document.querySelector('#gameView');
-  const $clickArea = document.querySelector('#clickArea');
+  //hide the thank you screen
 
-  // experiment.clickArea = {width:clickArea, height:clickArea};
+  const $gameContainer = document.querySelector('#game-container');
+  const $gameHUD = document.querySelector('#game-HUD');
+
+  let $choiceCards = document.querySelectorAll('.choice-card');
+  const $leftChoice = document.querySelector('#left');
+  const $rightChoice = document.querySelector('#right');
+  const $bunny = document.querySelector("#bunny");
+
+
+  const $feedback = document.querySelector('#feedback');
+
+  // const $clickArea = document.querySelector('#clickArea');
+
   //these two are hidden but left here for added functionality for future
   const $submitButton = document.querySelector('#submit');
   const $playButton = document.querySelector('#playback');
   // const $appHeader = document.querySelector('#app-header');
   const $gameUI = document.querySelector('#game-ui');
   const $thanks = document.querySelector('.thanks');
-  // const $sun = document.querySelector('.sun');
-
-  //get the click limit and convert it to a number
-  let clickLimit = parseInt(experiment.clickLimit);
-  //now check if the time limit has been set if so, set the time limit;
-  const timeLimit = parseInt(experiment.timeLimit);
-
-
-  // $appHeader.style.display = "none";
-
   //hide the thank you screen
   $thanks.style.display = "none";
   $thanks.style.opacity = 0;
+
+  setUpGameBoard();
+  setFirstBunny();
+  // showOptions();
+  fadeIn($bunny, 0.5);
+  revealFirstCard();
 
   //make sure the game view is 100% of the screen height
   // $gameView.style.height = window.innerHeight + "px";
@@ -145,89 +165,212 @@ function setUpGame() {
   $startBtn.addEventListener('click', function(e) {
     e.preventDefault();
     //play the video
-    if (video) {
-      if (video.paused) {
-        video.play();
-      }
-    }
+    // if (video) {
+    //   if (video.paused) {
+    //     video.play();
+    //   }
+    // }
     //fade out the game ui
     fadeOut($gameUI, true);
     $gameUI.style.pointerEvents = "none";
+    showOptions();
+    moveNext();
 
     //get the clickable area and store it to the variable
-    const clickBound = $clickArea.getBoundingClientRect();
+    // const clickBound = $clickArea.getBoundingClientRect();
     // experiment.clickArea = {width:clickArea.width, height:clickArea.height};
     experiment.windowSize = {
-      width:$game.getBoundingClientRect().width,
-      height:$game.getBoundingClientRect().height,
-      clickBounds: {
-        top: clickBound.top,
-        left: clickBound.left,
-        right:clickBound.right,
-        bottom:clickBound.bottom
-      }
+      width: $game.getBoundingClientRect().width,
+      height: $game.getBoundingClientRect().height
     };
-
-    //turn the game on with n seconds delay
-    setTimeout(function() {
-        isGameOn = true;
-        if (!timeID && timeLimit > 0) {
-          //only set up the timer if the time limit has been set
-          timeID = setTimeout(function() {
-            //console.log("timeout");
-            // $submitButton.dispatchEvent(clickEvent);
-            finishGame();
-          }, timeLimit*1000);
-        }
-    }, 4000);
-
   })
 
+  // setUpGameBoard();
+  // setUpBunny();
+  // showOptions();
   // $gameView.addEventListener('touchstart', () => {});
   // $gameView.addEventListener('touchend', () => {});
   // $gameView.addEventListener('touchcancel', () => {});
   // $gameView.addEventListener('touchmove', () => {});
   //gameview clicks
-  $gameView.addEventListener('click', function(e) {
-    //see if the click limit is left, if not, finish game
-    if(clickLimit > 0){
-      const clickAreaRect = $clickArea.getBoundingClientRect();
-      let inOrOut = isInside(e.offsetX, e.offsetY,clickAreaRect);
-      if (isGameOn) {
-        // console.log(inOrOut);
-        // if(inOrOut){
-        clickLimit--;
-        // }
-        let currentTime = new Date().getTime();
-        //create a new data of the current dot
-        const data = {
-          position: {
-            x: e.offsetX,
-            y: e.offsetY,
-            rX: inOrOut ? mapRange(e.offsetX, clickAreaRect.left, clickAreaRect.right, 0, 1) : -1,
-            rY: inOrOut ? mapRange(e.offsetY, clickAreaRect.top, clickAreaRect.bottom, 0, 1) : -1,
-            inside: inOrOut
-          },
-          time: currentTime
-        }
-        //add the data of the current dot to the existing dots
-        dots = [...dots, data];
-        //draw the dot on the screen
-        if(inOrOut){
-          createDot(data.position, this);
-        }
 
-        //this has no function right now because the submit button is hidden
-        //but left here just in case we bring back the button
-        if (dots.length > 0 && $submitButton.classList.contains('disabled')) {
-          $submitButton.classList.remove('disabled');
+  //set up gameboard
+  function setUpGameBoard() {
+    let col = 0;
+    let row = 0;
+    let x, y;
+    //generate random number sequence of 0 and 1
+    for (let i = 0; i < totalCards; i++) {
+      let r = Math.random() < 0.5 ? 0 : 1;
+      environment.push(r);
+
+      if (x > 1000) {
+        col = 1;
+        row++;
+      }
+
+      x = (cardWidth) * col + 20;
+      y = row * (cardWidth) + 10;
+      col++;
+      let $card = drawBGCard({
+        x: x,
+        y: y,
+        env: r,
+        id: i
+      });
+      $cards.push($card);
+    }
+  }
+
+  function setUpBunny() {
+    let $current = $cards[currentCardNum];
+    let bunnyPosition = $current.getBoundingClientRect();
+    console.log($current);
+    let x = bunnyPosition.x + bunnyPosition.width / 2;
+    let y = bunnyPosition.y + bunnyPosition.height / 2;
+    drawBunny({
+      x,
+      y
+    });
+  }
+
+  function setFirstBunny() {
+    drawBunny({
+      x:85,
+      y:75
+    });
+  }
+
+  function revealFirstCard(){
+    $cards[0].setAttribute('data-env', environment[0]);
+  }
+
+  function showOptions() {
+    // $gameHUD.style.opacity = 1;
+    let r = Math.random();
+
+    $leftChoice.setAttribute('data-choice', r > 0.5 ? 1 : 0);
+    $rightChoice.setAttribute('data-choice', r > 0.5 ? 0 : 1);
+    fadeIn($gameHUD, 1, "flex");
+  }
+
+  function drawBGCard(options, fadeOut = true, remove = true) {
+    const card = document.createElement('div');
+    card.classList.add('bgCard');
+    if (options.id == currentCardNum) {
+      card.classList.add('currentCard');
+    } else {
+      card.classList.remove('currentCard');
+    }
+
+    card.innerHTML = options.env;
+    card.style.pointerEvents = "none";
+    $gameContainer.append(card);
+    card.style.top = options.y + "px";
+    card.style.left = options.x + "px";
+    card.style.opacity = 0.6;
+    card.style.transform = "scale(0.6,0.6)"
+    card.setAttribute('data-index', options.id);
+    return card;
+  }
+
+  function drawBunny(options) {
+    $bunny.style.pointerEvents = "none";
+    $bunny.style.top = options.y + "px";
+    $bunny.style.left = options.x + "px";
+    $bunny.style.transform = "translate(-50%, -50%)";
+    // card.style.opacity = 0.6;
+    // card.style.transform = "scale(0.6,0.6)"
+  }
+
+
+  //event listeners
+  $choiceCards.forEach(function(userItem) {
+    userItem.addEventListener('click', function(e) {
+      e.preventDefault();
+      console.log("current card number: " + currentCardNum);
+      if (currentCardNum <= totalCards - 1) {
+        let choice = e.target.dataset.choice;
+        console.log("choice: " + choice);
+        choices = [...choices, parseInt(choice)];
+        //choices.push[choice];
+        moveNext();
+        $gameHUD.style.pointerEvents = "none";
+        fadeOut($gameHUD, false);
+        showFeedback();
+      } else {
+        //finish the game;
+      }
+    })
+  });
+  function showFeedback(){
+    fadeIn($feedback);
+    fadeOut($feedback, false, 0.5)
+  }
+  function moveNext() {
+    console.log(choices);
+    //change the current $card
+    if (currentCardNum == totalCards - 1) {
+      finishGame();
+    } else {
+      showOptions();
+      currentCardNum++;
+      $cards[currentCardNum - 1].classList.remove('currentCard');
+      $cards[currentCardNum].classList.add('currentCard');
+      setUpBunny();
+      const index = $cards[currentCardNum - 1].dataset.index;
+      //get the environment
+      const env = environment[parseInt(index)];
+      const ch = choices[choices.length - 1];
+      console.log("env: " + env + ", choice: " + ch);
+      if (env == ch) {
+        $feedback.innerHTML = "Correct!";
+        correct = [...correct, 1];
+      } else {
+        correct = [...correct, 0];
+        $feedback.innerHTML = "Oops, there was ";
+        if (env == 0) {
+          $feedback.innerHTML += "no carrot!";
+        } else {
+          $feedback.innerHTML += "a carrot!";
         }
       }
-    }else if(isGameOn){
-      //if the click limit has run out, finish the game
-      finishGame();
+      $cards[currentCardNum - 1].setAttribute('data-env', env);
     }
-  })
+
+  }
+
+  // function finishGame() {
+  //   currentCardNum++;
+  //   const index = $cards[currentCardNum - 1].dataset.index;
+  //   //get the environment
+  //   const env = environment[parseInt(index)];
+  //   const ch = choices[choices.length - 1];
+  //   console.log("env: " + env + ", choice: " + ch);
+  //   if (env == ch) {
+  //     $feedback.innerHTML = "Correct!";
+  //     correct = [...correct, 1];
+  //   } else {
+  //     correct = [...correct, 0];
+  //     $feedback.innerHTML = "Oops, there was ";
+  //     if (env == 0) {
+  //       $feedback.innerHTML += "no carrot!";
+  //     } else {
+  //       $feedback.innerHTML += "a carrot!";
+  //     }
+  //   }
+  //   $cards[currentCardNum - 1].setAttribute('data-env', env);
+  //   $cards[currentCardNum - 1].classList.remove('currentCard');
+  //   console.log("game finished");
+  //   //package the data
+  //   data = {
+  //     "environment": environment,
+  //     "choices": choices,
+  //     "correct": correct
+  //   }
+  //   //log the data
+  //   console.log(data);
+  // }
 
   //these are not functioning since these buttons are hidden
   //but left here just in case we bring back the feature
@@ -249,39 +392,59 @@ function setUpGame() {
   })
 
   function finishGame() {
-    // if(this.innerHTML==="Reset"){
-    //   dots=[];
-    //   [...$gameView.children].forEach((dot)=>{
-    //     dot.remove();
-    //   });
-    //   this.innerHTML = "Finish";
-    //   this.classList.add('disabled');
-    //   $playButton.classList.add('disabled');
-    //   $gameView.style.pointerEvents = "unset";
-    //   return;
-    // }
-    // console.log("clear timeout")
     //make sure we stop the timer if it's been created
-    if(timeID)
+    if (timeID)
       clearTimeout(timeID);
     isGameOn = false;
+
+    currentCardNum++;
+    const index = $cards[currentCardNum - 1].dataset.index;
+    //get the environment
+    const env = environment[parseInt(index)];
+    const ch = choices[choices.length - 1];
+    console.log("env: " + env + ", choice: " + ch);
+    if (env == ch) {
+      $feedback.innerHTML = "Correct!";
+      correct = [...correct, 1];
+    } else {
+      correct = [...correct, 0];
+      $feedback.innerHTML = "Oops, there was ";
+      if (env == 0) {
+        $feedback.innerHTML += "no carrot!";
+      } else {
+        $feedback.innerHTML += "a carrot!";
+      }
+    }
+    $cards[currentCardNum - 1].setAttribute('data-env', env);
+    $cards[currentCardNum - 1].classList.remove('currentCard');
+    console.log("game finished");
+    //package the data
+    sessionData = {
+      "environment": environment,
+      "choices": choices,
+      "correct": correct
+    }
+    //log the data
+    console.log(data);
     //put the dots to the experiment object
-    experiment.dots = dots;
+    experiment.choices = sessionData;
     //then store it to the storage which will post it to the database
     store.dispatch({
-      type: dots.length > 0 ? "ADD_DATA" : "REMOVE_DATA",
+      type: data.length > 0 ? "ADD_DATA" : "REMOVE_DATA",
       payload: {
         data: experiment
       }
     });
 
-    //empty the dots array
-    dots = [];
+    //empty-reset the choices array
+    choices = [-99];
+    correct = [-99];
+
     console.log("data logged");
     //fade in the thank you with half second delay
-    fadeIn($thanks,.5);
-    setTimeout(function(){
-        window.location.reload(1);
+    fadeIn($thanks, .5);
+    setTimeout(function() {
+      window.location.reload(1);
     }, 3000);
     // gsap.from('.sun', {y:200, duration:2.5, ease:"elastic.out(1, 0.3)", delay:1})
     // gsap.to('.sun',{filter:"blur(0px)", scale:1.2, repeat:-1, yoyo:true, duration:1});
@@ -290,60 +453,65 @@ function setUpGame() {
 }
 
 //function for drawing the dot on the screen
-function createDot(options, $gameView, fadeOut = true, remove = true) {
-  const dot = document.createElement('div');
-  dot.classList.add('rainDrop');
-  dot.style.pointerEvents = "none";
-  $gameView.append(dot);
-  dot.style.top = options.y + "px";
-  dot.style.left = options.x + "px";
-  dot.style.opacity = 0.6;
-  dot.style.transform = "scale(0.6,0.6)"
-  // fadeIn(dot);
-  gsap.to(dot, {
-    duration: .3,
-    ease: "power4.out",
-    transform: "scale(1,1)",
-    opacity: 1,
-    onComplete: fadeOut ? fade : null
-  });
+// function createDot(options, $gameView, fadeOut = true, remove = true) {
+//   const dot = document.createElement('div');
+//   dot.classList.add('rainDrop');
+//   dot.style.pointerEvents = "none";
+//   $gameView.append(dot);
+//   dot.style.top = options.y + "px";
+//   dot.style.left = options.x + "px";
+//   dot.style.opacity = 0.6;
+//   dot.style.transform = "scale(0.6,0.6)"
+//   // fadeIn(dot);
+//   gsap.to(dot, {
+//     duration: .3,
+//     ease: "power4.out",
+//     transform: "scale(1,1)",
+//     opacity: 1,
+//     onComplete: fadeOut ? fade : null
+//   });
+//
+//   function fade() {
+//     gsap.to(dot, {
+//       duration: 1,
+//       ease: "power4.in",
+//       opacity: 0,
+//       onComplete: remove ? removeDot : null
+//     });
+//   }
+//
+//   function removeDot() {
+//     dot.remove();
+//   }
+//
+//   // if(fadeOut){
+//   //   fade(dot, remove);
+//   // }
+// }
 
-  function fade() {
-    gsap.to(dot, {
-      duration: 1,
-      ease: "power4.in",
-      opacity: 0,
-      onComplete: remove ? removeDot : null
-    });
-  }
-
-  function removeDot() {
-    dot.remove();
-  }
-
-  // if(fadeOut){
-  //   fade(dot, remove);
-  // }
-}
+////////////
 //some utility functions for fading in and out using Greensock animation library (GSAP)
-function fadeIn(elem, delay) {
-  elem.style.display = "block";
+function fadeIn(elem, delay, display="block") {
+  elem.style.display = display;
   elem.style.opacity = 0;
   gsap.to(elem, {
     duration: 1,
     ease: "power1.inOut",
     opacity: 1,
-    delay: delay
+    delay: delay,
+    onComplete: enable,
+    onCompleteParams: [elem]
   });
 }
 
-function fadeOut(elem, hide) {
+function fadeOut(elem, hide, delay = 0) {
   gsap.to(elem, {
     duration: .5,
     ease: "power1.inOut",
     opacity: 0,
     onComplete: hide ? hideElem : null,
-    onCompleteParams: [elem]
+    onCompleteParams: [elem],
+    delay: delay
   });
 }
 
@@ -351,13 +519,17 @@ function hideElem(elem) {
   elem.style.display = "none";
 }
 
-function isInside(x,y,rect){
-  if(x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom){
-    return true;
-  }
-
-  return false;
+function enable(elem){
+  elem.style.pointerEvents = "auto";
 }
+
+// function isInside(x, y, rect) {
+//   if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
+//     return true;
+//   }
+//
+//   return false;
+// }
 
 function mapRange(num, in_min, in_max, out_min, out_max) {
   return (num - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
@@ -366,38 +538,38 @@ function mapRange(num, in_min, in_max, out_min, out_max) {
 function timeout(ms) {
   return new Promise(res => setTimeout(res, ms));
 }
-//dots play back function
-//not used right now but left here just in case
-async function replay(data, $gameView) {
-  $gameView.style.pointerEvents = "none";
-  // console.log(data);
-  let dTime = 0;
-  [...$gameView.children].forEach((dot) => {
-    dot.style.display = "none";
-    dot.style.opacity = 0;
-    dot.remove();
-  });
-
-  await timeout(500);
-
-  data.forEach(d => {
-    const playback = setTimeout(function() {
-      createDot(d.position, $gameView, false, false);
-    }, d.time - data[0].time);
-    dTime = d.time - data[0].time;
-  })
-
-  const done = setTimeout(function() {
-
-    [...$gameView.children].forEach((dot) => {
-      dot.style.display = "unset";
-      dot.style.opacity = .9;
-    });
-
-    document.querySelector('#playback').classList.remove('disabled');
-    document.querySelector('#submit').innerHTML = "Reset";
-    document.querySelector('#submit').classList.remove('disabled');
-
-  }, dTime + 500);
-
-}
+// //dots play back function
+// //not used right now but left here just in case
+// async function replay(data, $gameView) {
+//   $gameView.style.pointerEvents = "none";
+//   // console.log(data);
+//   let dTime = 0;
+//   [...$gameView.children].forEach((dot) => {
+//     dot.style.display = "none";
+//     dot.style.opacity = 0;
+//     dot.remove();
+//   });
+//
+//   await timeout(500);
+//
+//   data.forEach(d => {
+//     const playback = setTimeout(function() {
+//       createDot(d.position, $gameView, false, false);
+//     }, d.time - data[0].time);
+//     dTime = d.time - data[0].time;
+//   })
+//
+//   const done = setTimeout(function() {
+//
+//     [...$gameView.children].forEach((dot) => {
+//       dot.style.display = "unset";
+//       dot.style.opacity = .9;
+//     });
+//
+//     document.querySelector('#playback').classList.remove('disabled');
+//     document.querySelector('#submit').innerHTML = "Reset";
+//     document.querySelector('#submit').classList.remove('disabled');
+//
+//   }, dTime + 500);
+//
+// }

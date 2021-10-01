@@ -19,7 +19,8 @@ const dataReducer = (state=initialState, action) => {
     case 'ADD_DATA':
       {
         const data = [...state.data, action.payload.data];
-        postData('./raindots',{data})
+        postData('./rabbits',{data})
+        // postData('./raindots',{data})
         .then((data) => {
           console.log(data); // JSON data parsed by `response.json()` call
         });

@@ -1,7 +1,7 @@
 {
-  "name": "RainDrops",
-  "short_name": "RainDrops",
-  "description": "Experiment",
+  "name": "RabbitTask",
+  "short_name": "RabbitTask",
+  "description": "Experiment Task One",
   "version": "0.0.0.1",
   "manifest_version": 1,
   "author": "Bang Geul Han",
@@ -12,7 +12,7 @@
   "background_color": "#F7F4F3",
   "app": {
     "urls": [
-      "https://raindrops-experiment.herokuapp.com/"
+      "https://rabbittask-experiment.herokuapp.com/"
     ],
     "permissions": [
       "fullscreen"

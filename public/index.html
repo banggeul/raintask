@@ -2,60 +2,34 @@
 <html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8">
+    <title>Rabbit Task</title>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="viewport" content="width=device-width, user-scalable=no">
-    <title>Rain Drops</title>
     <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="style.css">
     <link rel="apple-touch-icon" href="touch-icon-iphone.png">
     <link rel="apple-touch-icon" sizes="152x152" href="icon-ipad.png">
     <link rel="apple-touch-icon" sizes="180x180" href="icon-iphone-retina.png">
     <link rel="apple-touch-icon" sizes="167x167" href="icon-ipad-retina.png">
-
   </head>
   <body>
     <div id="app-container">
-      <div class="video-container">
-        <video playsinline muted >
-          <source src="trees1.mp4" type="video/mp4" poster="trees.png">
-          Your browser does not support HTML5 video.
-        </video>
-      </div>
-      <div class="" id="content">
-
-      </div>
+      <div class="" id="content"></div>
       <div class="container">
-        <h1>Rain Drops Game</h1>
+        <h1>Carrot or No Carrot, That is the Question</h1>
         <div id="user-context">
           <div class="formRow">
             <label for="sessionID">Enter Session ID</label>
             <input onClick="this.setSelectionRange(0, this.value.length);" type="text" name="name" id="name" value="12345">
           </div>
-          <div class="formRow">
-            <label for="clickLimit">Set the click limit</label>
-            <input onClick="this.setSelectionRange(0, this.value.length);" type="number" id="clickLimit" name="" min="10" max="100" value="20">
-          </div>
-          <div class="formRow timeLimitSwitch">
-            <label for="timeLimitOn">Turn on the time limit</label>
-            <div class="switchWrapper">
-              <label class="switch">
-                  <input type="checkbox" id="timeLimitSwitch">
-                  <span class="slider round"></span>
-              </label>
-            </div>
-          </div>
-          <div class="formRow" id="timeLimitRow">
-            <label for="timeLimit">Set the time limit (in seconds)</label>
-            <input onClick="this.setSelectionRange(0, this.value.length);" type="number" id="timeLimit" name="" min="20" max="100" value = "20">
-          </div>
           <div class="formRow" id="age">
             <label for="age">Age:</label>
             <div class="ageInputRow">
               <div class="ageInputCol">
-                <label for="year"> Year </label> <input onClick="this.setSelectionRange(0, this.value.length);" type="number" name="" value="5" min="1" max="100" id="ageYear">
+                <label for="year"> Year </label> <input onClick="this.setSelectionRange(0, this.value.length);" type="tel" name="" value="5" min="1" max="100" id="ageYear">
               </div>
               <div class="ageInputCol">
-                <label for="month"> Months </label> <input onClick="this.setSelectionRange(0, this.value.length);" type="number" name="" value="0" min="0" max="11" id="ageMonth">
+                <label for="month"> Months </label> <input onClick="this.setSelectionRange(0, this.value.length);" type="tel" name="" value="0" min="0" max="11" id="ageMonth">
               </div>
             </div>
           </div>
@@ -66,20 +40,20 @@
               <option value="male">M</option>
               <option value="nonbinary">X</option>
             </select>
-            <!-- <div class="genderInputRow">
-              <div class="genderOption">
-                <input type="radio" id="male" name="gender" value="female" checked>
-                <label for="female">F</label>
-              </div>
-              <div class="genderOption">
-                <input type="radio" id="female" name="gender" value="male">
-                <label for="male">M</label>
-              </div>
-              <div class="genderOption">
-                <input type="radio" id="nonbinary" name="gender" value="nonbinary">
-                <label for="nonbinary">X</label>
-              </div>
-            </div> -->
+          </div>
+          <div class="formRow" id="imageSetOptionRow">
+            <label for="imageSet">Image Set</label>
+            <select id="imageSetOptions" name="imageSetOptions">
+              <option value="rabbit">Rabbit</option>
+              <option value="octopus">Octopus</option>
+              <option value="turtle">Turtle</option>
+            </select>
+          </div>
+          <div class="formRow" id="sequenceOptionRow">
+            <label for="sequence">Sequence Set</label>
+            <div class="sequenceInputRow">
+              <input onClick="this.setSelectionRange(0, this.value.length);" type="tel" name="" value="1" min="1" max="100" id="sequenceSet">
+            </div>
           </div>
             <a class="cta" href="#" id="collectUserContext">Submit</a>
         </div>

@@ -18,12 +18,13 @@ MongoClient.connect(dbConnectionString,{ useNewUrlParser: true, useUnifiedTopolo
   .then(client=>{
     console.log('Connected to Database');
     const db = client.db('dbDrops');
-    const collection = db.collection('raindots');
+    const collection = db.collection('rabbits');
+    // const collection = db.collection('raindots');
 
-    app.get('/raindots', (req, res) => {
+    app.get('/rabbits', (req, res) => {
       //do something
       // res.sendFile(__dirname + '/public/');
-      db.collection('raindots').find().toArray()
+      db.collection('rabbits').find().toArray()
         .then(results =>{
           console.log(results);
           res.json(results);
@@ -32,7 +33,7 @@ MongoClient.connect(dbConnectionString,{ useNewUrlParser: true, useUnifiedTopolo
         .catch(error=>console.error(error));
 
     })
-    app.post('/raindots',(req,res)=>{
+    app.post('/rabbits',(req,res)=>{
       console.log(req.body);
       collection.insertOne(req.body)
         .then(result=>{

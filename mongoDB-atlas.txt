@@ -3,7 +3,7 @@ heroku_qfqkm36q
 
 mlab password
 
-MongoDB atlas 
+MongoDB atlas
 
 raindrops development
 
@@ -15,6 +15,12 @@ password: Pbvt3OX8TwOcwNg7
 database name: dbDrops
 collection name: raindots
 
+database name: dbDrops
+collection name: rabbits
+
+
+database name: dbPeach2D
+collection name: stories
 
 const MongoClient = require('mongodb').MongoClient;
 const uri = "mongodb+srv://dbRainUser:Pbvt3OX8TwOcwNg7@cluster0.kut1l.mongodb.net/dbDrops?retryWrites=true&w=majority";
@@ -27,5 +33,9 @@ client.connect(err => {
 
 1. connect the mongodb atals to the raindrops project
 2. run it locally to make sure it works
-3. create a new heroku app 
+3. create a new heroku app
 4. configure the heroku to connect to the mongodb atlas
+  4.1 go to the settings of the new app - find the config vars section 
+  4.2 set the key to MONGODB_URI and set the value to below connection string
+
+mongodb+srv://dbRainUser:Pbvt3OX8TwOcwNg7@cluster0.kut1l.mongodb.net/dbDrops?retryWrites=true&w=majority
