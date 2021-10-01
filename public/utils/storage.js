@@ -22,7 +22,7 @@ const dataReducer = (state=initialState, action) => {
         postData('./rabbits',{data})
         // postData('./raindots',{data})
         .then((data) => {
-          console.log(data); // JSON data parsed by `response.json()` call
+          console.log("here's the data: " + data); // JSON data parsed by `response.json()` call
         });
         return {data};
       }
