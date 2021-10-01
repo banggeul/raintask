@@ -425,12 +425,12 @@ function setUpGame() {
       "correct": correct
     }
     //log the data
-    console.log(sessionData);
+    console.log(sessionData.length);
     //put the dots to the experiment object
     experiment.choices = sessionData;
     //then store it to the storage which will post it to the database
     store.dispatch({
-      type: sessionData.length > 0 ? "ADD_DATA" : "REMOVE_DATA",
+      type: choices.length > 0 ? "ADD_DATA" : "REMOVE_DATA",
       payload: {
         data: experiment
       }
