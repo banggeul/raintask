@@ -16,7 +16,7 @@ app.use(express.json({limit:'1mb'}));
 app.use(express.static('public'));
 MongoClient.connect(dbConnectionString,{ useNewUrlParser: true, useUnifiedTopology: true})
   .then(client=>{
-    console.log('Connected to Database');
+    console.log('Connected to Database dbDrops and collection rabbits');
     const db = client.db('dbDrops');
     const collection = db.collection('rabbits');
     // const collection = db.collection('raindots');
