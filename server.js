@@ -31,7 +31,17 @@ MongoClient.connect(dbConnectionString,{ useNewUrlParser: true, useUnifiedTopolo
           // res.render('index.ejs',{turtles:results})
         })
         .catch(error=>console.error(error));
-
+    })
+    app.get('/sequenceSet', (req, res) => {
+      //do something
+      // res.sendFile(__dirname + '/public/');
+      db.collection('sequenceSet').find().toArray()
+        .then(results =>{
+          console.log(results);
+          res.json(results);
+          // res.render('index.ejs',{turtles:results})
+        })
+        .catch(error=>console.error(error));
     })
     app.post('/rabbits',(req,res)=>{
       console.log(req.body);

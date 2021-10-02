@@ -427,7 +427,7 @@ function setUpGame() {
     //log the data
     console.log(sessionData.length);
     //put the dots to the experiment object
-    experiment.choices = sessionData;
+    experiment.sequences = sessionData;
     //then store it to the storage which will post it to the database
     store.dispatch({
       type: choices.length > 0 ? "ADD_DATA" : "REMOVE_DATA",
