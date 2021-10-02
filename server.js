@@ -23,22 +23,27 @@ MongoClient.connect(dbConnectionString,{ useNewUrlParser: true, useUnifiedTopolo
 
     app.get('/rabbits', (req, res) => {
       //do something
+
       // res.sendFile(__dirname + '/public/');
       db.collection('rabbits').find().toArray()
         .then(results =>{
           console.log(results);
           res.json(results);
+
           // res.render('index.ejs',{turtles:results})
         })
         .catch(error=>console.error(error));
     })
-    app.get('/sequenceSet', (req, res) => {
+    app.get('/', (req, res) => {
       //do something
+      var resultArray = [];
       // res.sendFile(__dirname + '/public/');
       db.collection('sequenceSet').find().toArray()
         .then(results =>{
           console.log(results);
           res.json(results);
+          resultArray.push(results);
+          // res.render('index', {squenceSet:resultArray});
           // res.render('index.ejs',{turtles:results})
         })
         .catch(error=>console.error(error));
